@@ -75,32 +75,17 @@
 
 <script>
 // ---------- PROMPTS ----------
-const prompts=[
- "A smart toothbrush that gives you dating advice.",
- "A drone that delivers coffee to your desk.",
- "Shoes that generate electricity as you walk.",
- "A fridge that tells you jokes when it opens.",
- "An app that helps dogs meditate.",
- "A hat that translates thoughts into emojis.",
- "A reusable rocket-powered skateboard.",
- "A pen that writes your dreams as stories.",
- "A water bottle that tracks your hydration and mood.",
- "A smart mirror that gives you fashion advice.",
- "A chair that improves posture and reminds you to stretch.",
- "A pillow that adjusts its temperature for perfect sleep.",
- "A plant pot that texts you when your plant is thirsty.",
- "A virtual reality gym that makes exercise a game.",
- "A keyboard that gives writing feedback.",
- "An umbrella that forecasts the weather.",
- "A backpack that charges your devices with solar power.",
- "A smartwatch that suggests mindfulness breaks.",
- "A smart mug that keeps your drink at the ideal temperature.",
- "A bicycle helmet that displays turn signals and safety alerts.",
- "A cooking pan that tells you when your food is perfectly done.",
- "A desk that automatically adjusts height based on posture.",
- "A wardrobe that recommends outfits based on the weather.",
- "A light bulb that mimics sunlight throughout the day.",
- "A voice assistant that gives pep talks before meetings."
+const prompts = [
+  "A smart toothbrush that gives you dating advice.",
+  "A drone that delivers coffee to your desk.",
+  "Shoes that generate electricity as you walk.",
+  "A fridge that tells you jokes when it opens.",
+  "An app that helps dogs meditate.",
+  "A hat that translates thoughts into emojis.",
+  "A reusable rocket-powered skateboard.",
+  "A pen that writes your dreams as stories.",
+  "A water bottle that tracks your hydration and mood.",
+  "A smart mirror that gives you fashion advice."
 ];
 
 // ---------- BASIC SETUP ----------
@@ -149,57 +134,66 @@ function submitPitch(){
 }
 
 // ---------- MOCK PITCH POOL ----------
-const mockIdeas={
- toothbrush:[
-  "Imagine starting your morning with confidence. BrushMate doesn’t just clean — it coaches you with real-time flirting tips as you brush, boosting both your smile and your dating game!",
-  "SmileSync is your personal wingman in the bathroom mirror. While you brush, it syncs with your phone to give you personalized advice on charm, posture, and first impressions.",
-  "HeartBright is for those who know that confidence begins with a clean smile. It’s a smart toothbrush that keeps your teeth polished and your confidence brighter than ever."
- ],
- drone:[
-  "Meet BrewFly — the office hero we all needed. A smart drone that knows your coffee preference and delivers a fresh cup the moment your productivity dips.",
-  "MochaMover combines caffeine and convenience. With a simple voice command, a steaming latte hovers right to your desk — no lines, no spills, pure joy.",
-  "Caffeine Cloud redefines morning routines. Imagine drones forming a flying coffee convoy, delivering handcrafted brews before your first meeting."
- ],
- shoes:[
-  "VoltStep transforms every step into clean energy. Walk, run, or dance — you’re powering your phone, your music, and a sustainable future.",
-  "ChargeWalk isn’t just footwear; it’s a portable power station. Sleek design meets energy innovation, giving you a charge with every move.",
-  "EcoStride converts footsteps into electricity, turning your daily routine into an act of green empowerment."
- ],
- fridge:[
-  "LaughnChill is your kitchen companion that actually talks back — with jokes, recipes, and reminders to stop eating at midnight!",
-  "CoolMood uses humor and light to make food storage fun. It even tells a dad joke every time you grab milk.",
-  "FreshlyFunny takes away the guilt of snacking with AI-powered wit and stand-up-level humor every time you open the door."
- ],
- app:[
-  "PawMind helps your dog find inner peace with guided meditation tones and scent therapy. A calmer pup means a happier home!",
-  "ZenPup turns anxious barks into blissful naps through ambient music made for dogs. Yes, Fido finally finds his Zen.",
-  "CalmCanine is the first mental wellness app for pets — soothing soundscapes, breathing cues, and owner-dog sync sessions."
- ],
- hat:[
-  "EmotiCap reads your brainwaves and displays emojis that match your mood — perfect for introverts who still want to express themselves!",
-  "ThinkLight projects your thoughts as glowing color patterns, turning communication into an art form.",
-  "MoodBeam lets your team see your vibes before you even speak. Transparent emotions — literally."
- ],
- skateboard:[
-  "SkyBoard is where eco design meets adrenaline. This reusable rocket skateboard lets you commute like it’s 2090.",
-  "ThrustDeck is the skateboard for thrill-seekers. Its compact rockets give instant acceleration with total safety.",
-  "EcoGlide brings sustainability and excitement together — rocket speed, reusable fuel, and zero emissions."
- ],
- pen:[
-  "DreamScribe lets you wake up to find your dreams already written. It uses motion sensors and AI to turn sleep stories into real text.",
-  "NightWriter is your creative companion — it listens to your dreams and crafts short stories by morning.",
-  "SomniPen bridges your imagination and reality. Every flick of ink reveals what your subconscious saw last night."
- ],
- mirror:[
-  "StyleSync Mirror doesn’t just show your reflection — it’s your personal stylist, analyzing outfits and suggesting upgrades instantly.",
-  "GlamAI Mirror helps you look runway-ready every morning, with lighting and outfit suggestions powered by global fashion trends.",
-  "MoodMirror adjusts tones and music to match your energy, transforming your mirror time into a full experience."
- ],
- bottle:[
-  "HydraMood tracks your water intake and changes color to reflect your energy level — hydration meets self-awareness.",
-  "AquaPulse keeps you hydrated with smart reminders and motivational lights that glow when it’s time to drink.",
-  "SipSync monitors hydration and mood through your wristband, syncing data for balanced living."
- ]
+const mockIdeas = {
+  toothbrush: [
+    "BrushMate is a connected toothbrush that analyzes your smile and gives gentle confidence tips through an app — because a great smile starts conversations.",
+    "SmileSync pairs brushing data with short self-improvement prompts to help you project confidence in daily interactions.",
+    "HeartBright uses AI to analyze your brushing patterns and facial expressions, giving personalized positivity tips each morning."
+  ],
+
+  drone: [
+    "BrewFly is a compact drone network designed for offices — it delivers fresh coffee to your desk using location beacons and simple voice commands.",
+    "MochaMover integrates with local cafés to automate small-batch deliveries, ensuring every employee gets their perfect cup on time.",
+    "PerkPilot is an autonomous coffee drone that syncs with your schedule and brings you caffeine refills during your busiest hours."
+  ],
+
+  shoes: [
+    "VoltStep is footwear that captures kinetic energy from your steps to charge small devices, blending comfort and sustainability.",
+    "EcoStride converts motion into clean power through flexible piezoelectric soles, providing a reliable charge while you walk.",
+    "ChargeWalk uses lightweight generators in the heel to power your phone or tracker — perfect for commuters and travelers."
+  ],
+
+  fridge: [
+    "LaughnChill is a smart fridge that lightens your day with quick jokes and healthy reminders whenever you open the door.",
+    "CoolMood combines humor and practical alerts — it suggests recipes and makes you smile while helping you reduce food waste.",
+    "FreshlyFunny adds personality to your kitchen, turning everyday fridge visits into small moments of levity."
+  ],
+
+  app: [
+    "PawMind offers calming soundscapes and guided breathing for pets, helping dogs relax when their owners are away.",
+    "ZenPup uses AI-adjusted frequencies and scents to reduce anxiety in dogs during storms or fireworks.",
+    "CalmCanine syncs owner and pet relaxation sessions, promoting a calmer, healthier household."
+  ],
+
+  hat: [
+    "EmotiCap reads basic EEG patterns to display emojis that reflect your mood — ideal for group settings and mental health awareness.",
+    "ThinkLight converts simple brainwave signals into color patterns, turning emotions into visual communication.",
+    "MoodBeam offers a fun way to express how you feel without words, using subtle LED cues mapped to your emotional state."
+  ],
+
+  skateboard: [
+    "SkyBoard is a sustainable powered board that uses micro-thrusters for quick acceleration, ideal for short urban commutes.",
+    "ThrustDeck focuses on controlled propulsion — rechargeable canisters give riders a boost without noise or pollution.",
+    "EcoGlide combines compact rocket assist with carbon-neutral fuel cells for a faster, greener ride."
+  ],
+
+  pen: [
+    "DreamScribe captures nocturnal thoughts by recording brief hand movements and turning them into short written summaries.",
+    "NightWriter pairs with a bedside sensor to transcribe sleep-talk or dream notes into readable text each morning.",
+    "SomniPen is a concept pen that uses gentle tracking and AI to interpret and archive nighttime creativity."
+  ],
+
+  mirror: [
+    "StyleSync Mirror scans your outfit and suggests complementary colors or accessories based on current trends.",
+    "GlamAI Mirror gives real-time fashion feedback using an onboard camera and cloud-based style analysis.",
+    "MoodMirror adjusts lighting and plays background music to help you prepare for work or a night out confidently."
+  ],
+
+  bottle: [
+    "HydraMood tracks your hydration and daily rhythm, using subtle color feedback to remind you to drink more water.",
+    "AquaPulse uses built-in sensors to monitor both intake and mood, helping users stay energized throughout the day.",
+    "SipSync connects to a mobile app that logs your drinking habits and offers reminders aligned with your activity level."
+  ]
 };
 
 // ---------- SHOW VOTING ----------
