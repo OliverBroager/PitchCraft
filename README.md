@@ -37,8 +37,7 @@ Then you’ll see mock competitors present their own versions, rate them, give s
 
 ## 🚀 Try It Online
 
-👉 **[Play PitchCraft on GitHub Pages](https://YOUR-USERNAME.github.io/pitchcraft/)**  
-*(Replace `YOUR-USERNAME` with your actual GitHub username once deployed.)*
+👉 **[Play PitchCraft on GitHub Pages](https://oliverbroager.github.io/PitchCraft/game)**  
 
 ---
 
