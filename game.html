@@ -197,30 +197,75 @@ const mockIdeas = {
 };
 
 // ---------- SHOW VOTING ----------
-function showVoting(){
- hide("pitch-display");$("rate-others").classList.remove("hidden");
- const prompt=$("prompt-text").textContent;$("round-product").textContent="Product: "+prompt;
- const yourPitch=$("pitch-text").value||"(No pitch)";
- $("your-pitch-card").innerHTML=`<h3>Your Pitch</h3><p>${yourPitch}</p>`;
- const topicKey=Object.keys(mockIdeas).find(k=>prompt.toLowerCase().includes(k))||"toothbrush";
- const c=$("rate-container");c.innerHTML="";
- mocks.forEach(m=>{
-  const idea=pick(mockIdeas[topicKey]);
-  const div=document.createElement("div");
-  div.className="pitch-card";
-  div.innerHTML=`<h4>${m.name}</h4><p>${idea}</p>
-   <label>Points (0–5): <input type="number" min="0" max="5" value="0" data-player="${m.name}"></label><br>
-   <label>Feedback: <input type="text" data-feedback="${m.name}" placeholder="Short feedback..."></label>`;
-  c.appendChild(div);
- });
- const inputs=c.querySelectorAll('input[type="number"]');
- const btn=$("submit-ratings"),left=$("points-left");
- function update(){
-  let total=0;inputs.forEach(i=>{i.value=Math.max(0,Math.min(5,Number(i.value)));total+=Number(i.value);});
-  left.textContent="Points left: "+(giveTotal-total);btn.disabled=(total!==giveTotal);
- }
- inputs.forEach(i=>i.addEventListener("input",update));update();
+function showVoting() {
+  hide("pitch-display");
+  $("rate-others").classList.remove("hidden");
+
+  const prompt = $("prompt-text").textContent;
+  $("round-product").textContent = "Product: " + prompt;
+
+  const yourPitch = $("pitch-text").value || "(No pitch)";
+  $("your-pitch-card").innerHTML = `<h3>Your Pitch</h3><p>${yourPitch}</p>`;
+
+  // Better matching by finding keyword from prompts
+  let topicKey = Object.keys(mockIdeas).find(k =>
+    prompt.toLowerCase().includes(k)
+  );
+
+  if (!topicKey) {
+    // fallback to a random category if not matched
+    topicKey = pick(Object.keys(mockIdeas));
+  }
+
+  // Deep clone and shuffle to avoid duplicates
+  const ideas = [...mockIdeas[topicKey]].sort(() => Math.random() - 0.5);
+
+  const c = $("rate-container");
+  c.innerHTML = "";
+
+  const styleHints = [
+    " (presented with confident energy)",
+    " (with a data-driven focus)",
+    " (pitched as an emotional storytelling angle)"
+  ];
+
+  mocks.forEach((m, idx) => {
+    const idea = ideas[idx % ideas.length]; // ensures unique or fallback reuse
+    const variation = idea + styleHints[idx]; // adds a little personality flair
+
+    const div = document.createElement("div");
+    div.className = "pitch-card";
+    div.innerHTML = `
+      <h4>${m.name}</h4>
+      <p>${variation}</p>
+      <label>Points (0–5): 
+        <input type="number" min="0" max="5" value="0" data-player="${m.name}">
+      </label><br>
+      <label>Feedback: 
+        <input type="text" data-feedback="${m.name}" placeholder="Short feedback...">
+      </label>
+    `;
+    c.appendChild(div);
+  });
+
+  const inputs = c.querySelectorAll('input[type="number"]');
+  const btn = $("submit-ratings");
+  const left = $("points-left");
+
+  function update() {
+    let total = 0;
+    inputs.forEach(i => {
+      i.value = Math.max(0, Math.min(5, Number(i.value)));
+      total += Number(i.value);
+    });
+    left.textContent = "Points left: " + (giveTotal - total);
+    btn.disabled = total !== giveTotal;
+  }
+
+  inputs.forEach(i => i.addEventListener("input", update));
+  update();
 }
+
 
 // ---------- RATING ----------
 function submitRatings(){
