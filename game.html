@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PitchCraft</title>
+<style>
+ body{font-family:Arial,Helvetica,sans-serif;background:#f6f7fb;color:#222;margin:0;text-align:center;}
+ header{background:#4f46e5;color:#fff;padding:1rem;font-size:1.4rem;font-weight:bold;}
+ #game{max-width:900px;margin:2rem auto;background:#fff;border-radius:12px;padding:2rem;box-shadow:0 2px 10px rgba(0,0,0,.1);}
+ button{background:#4f46e5;color:#fff;border:none;padding:.6rem 1rem;border-radius:8px;cursor:pointer;margin:.4rem;font-size:1rem;}
+ button:disabled{opacity:.6;cursor:not-allowed;}
+ textarea,input[type="text"],input[type="number"]{width:100%;padding:.6rem;border:1px solid #ccc;border-radius:8px;font-size:1rem;margin-top:.3rem;}
+ .hidden{display:none;}
+ .pitch-card{background:#f9fafb;border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0;text-align:left;}
+ .feedback-card{background:#eef2ff;border-radius:8px;padding:.8rem;margin:.5rem 0;text-align:left;}
+ .leaderboard table{width:100%;border-collapse:collapse;}
+ .leaderboard th,.leaderboard td{border-bottom:1px solid #ddd;padding:.6rem;text-align:left;}
+ .muted{color:#6b7280;}
+ img{max-width:100%;border-radius:8px;margin-top:.5rem;}
+</style>
+</head>
+<body>
+<header>🎤 PitchCraft - Prototype</header>
+
+<div id="game">
+<section id="start-screen">
+ <p>Give 10 points (max 5 each). Upvotes don’t add points now — most upvotes at the end = +10 bonus. The game here will be played against other mock players where in the real game it should be against other real players. Enjoy!</p>
+ <button id="start-btn">Start Game</button>
+</section>
+
+<section id="prompt-screen" class="hidden">
+ <h2>Your Product Prompt</h2>
+ <p id="prompt-text"></p>
+ <p>Time left: <span id="timer">60</span>s</p>
+ <textarea id="pitch-text" placeholder="Write your pitch..."></textarea>
+ <input id="img-url" type="text" placeholder="(Optional) Add image URL">
+ <button id="submit-pitch">Submit Pitch</button>
+</section>
+
+<section id="pitch-display" class="hidden">
+ <h2>Your Pitch</h2>
+ <p id="pitch-output"></p><img id="pitch-image"><p class="muted">Waiting for others…</p>
+</section>
+
+<section id="rate-others" class="hidden">
+ <h2>Rate Other Pitches</h2>
+ <p id="round-product" class="muted"></p>
+ <div id="your-pitch-card" class="pitch-card"></div>
+ <p class="muted">Distribute <b>10 points</b> (max 5 each) and leave feedback.</p>
+ <div id="rate-container"></div>
+ <p id="points-left" class="muted">Points left: 10</p>
+ <button id="submit-ratings" disabled>Submit Ratings</button>
+</section>
+
+<section id="feedback-phase" class="hidden">
+ <h2>Feedback You Received</h2>
+ <p class="muted">Upvote one helpful comment.</p>
+ <div id="feedback-list"></div>
+ <button id="submit-feedback" disabled>Continue</button>
+</section>
+
+<section id="leaderboard-screen" class="hidden">
+ <h2>Round Results</h2>
+ <div id="round-leaderboard" class="leaderboard"></div>
+ <button id="next-round">Next Round</button>
+</section>
+
+<section id="end-screen" class="hidden">
+ <h2>🏁 Final Leaderboard</h2>
+ <p class="muted">Most upvotes → +10 bonus points.</p>
+ <div id="final-leaderboard" class="leaderboard"></div>
+ <button onclick="location.reload()">Play Again</button>
+</section>
+</div>
+
+<script>
+// ---------- PROMPTS ----------
+const prompts=[
+ "A smart toothbrush that gives you dating advice.",
+ "A drone that delivers coffee to your desk.",
+ "Shoes that generate electricity as you walk.",
+ "A fridge that tells you jokes when it opens.",
+ "An app that helps dogs meditate.",
+ "A hat that translates thoughts into emojis.",
+ "A reusable rocket-powered skateboard.",
+ "A pen that writes your dreams as stories.",
+ "A water bottle that tracks your hydration and mood.",
+ "A smart mirror that gives you fashion advice.",
+ "A chair that improves posture and reminds you to stretch.",
+ "A pillow that adjusts its temperature for perfect sleep.",
+ "A plant pot that texts you when your plant is thirsty.",
+ "A virtual reality gym that makes exercise a game.",
+ "A keyboard that gives writing feedback.",
+ "An umbrella that forecasts the weather.",
+ "A backpack that charges your devices with solar power.",
+ "A smartwatch that suggests mindfulness breaks.",
+ "A smart mug that keeps your drink at the ideal temperature.",
+ "A bicycle helmet that displays turn signals and safety alerts.",
+ "A cooking pan that tells you when your food is perfectly done.",
+ "A desk that automatically adjusts height based on posture.",
+ "A wardrobe that recommends outfits based on the weather.",
+ "A light bulb that mimics sunlight throughout the day.",
+ "A voice assistant that gives pep talks before meetings."
+];
+
+// ---------- BASIC SETUP ----------
+const mocks=[
+ {name:"Alex",score:0,upvotes:0},
+ {name:"Jamie",score:0,upvotes:0},
+ {name:"Riley",score:0,upvotes:0}
+];
+const player={name:"You",score:0,upvotes:0};
+const giveTotal=10,maxPer=5,receiveCap=15,rounds=3;
+let round=0,timer=60,tInt;
+
+const $=id=>document.getElementById(id);
+function hide(...ids){ids.forEach(i=>$(i).classList.add("hidden"));}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+
+// ---------- BUTTONS ----------
+$("start-btn").onclick=startGame;
+$("submit-pitch").onclick=submitPitch;
+$("submit-ratings").onclick=submitRatings;
+$("submit-feedback").onclick=submitFeedback;
+$("next-round").onclick=nextRound;
+
+// ---------- FLOW ----------
+function startGame(){round=1;reset();newRound();}
+function reset(){player.score=player.upvotes=0;mocks.forEach(m=>{m.score=0;m.upvotes=0;});}
+function newRound(){
+ hide("start-screen","leaderboard-screen","end-screen");
+ $("prompt-screen").classList.remove("hidden");
+ const prompt=pick(prompts);
+ $("prompt-text").textContent=prompt;
+ $("pitch-text").value="";$("img-url").value="";
+ timer=60;$("timer").textContent=timer;
+ if(tInt)clearInterval(tInt);
+ tInt=setInterval(()=>{timer--;$("timer").textContent=timer;if(timer<=0){clearInterval(tInt);submitPitch();}},1000);
+}
+
+// ---------- PITCH PHASE ----------
+function submitPitch(){
+ clearInterval(tInt);
+ hide("prompt-screen");$("pitch-display").classList.remove("hidden");
+ $("pitch-output").textContent=$("pitch-text").value||"(No pitch)";
+ const img=$("img-url").value.trim(),imgEl=$("pitch-image");
+ if(img){imgEl.src=img;imgEl.style.display="block";}else imgEl.style.display="none";
+ setTimeout(showVoting,1000);
+}
+
+// ---------- MOCK PITCH POOL ----------
+const mockIdeas={
+ toothbrush:[
+  "Imagine starting your morning with confidence. BrushMate doesn’t just clean — it coaches you with real-time flirting tips as you brush, boosting both your smile and your dating game!",
+  "SmileSync is your personal wingman in the bathroom mirror. While you brush, it syncs with your phone to give you personalized advice on charm, posture, and first impressions.",
+  "HeartBright is for those who know that confidence begins with a clean smile. It’s a smart toothbrush that keeps your teeth polished and your confidence brighter than ever."
+ ],
+ drone:[
+  "Meet BrewFly — the office hero we all needed. A smart drone that knows your coffee preference and delivers a fresh cup the moment your productivity dips.",
+  "MochaMover combines caffeine and convenience. With a simple voice command, a steaming latte hovers right to your desk — no lines, no spills, pure joy.",
+  "Caffeine Cloud redefines morning routines. Imagine drones forming a flying coffee convoy, delivering handcrafted brews before your first meeting."
+ ],
+ shoes:[
+  "VoltStep transforms every step into clean energy. Walk, run, or dance — you’re powering your phone, your music, and a sustainable future.",
+  "ChargeWalk isn’t just footwear; it’s a portable power station. Sleek design meets energy innovation, giving you a charge with every move.",
+  "EcoStride converts footsteps into electricity, turning your daily routine into an act of green empowerment."
+ ],
+ fridge:[
+  "LaughnChill is your kitchen companion that actually talks back — with jokes, recipes, and reminders to stop eating at midnight!",
+  "CoolMood uses humor and light to make food storage fun. It even tells a dad joke every time you grab milk.",
+  "FreshlyFunny takes away the guilt of snacking with AI-powered wit and stand-up-level humor every time you open the door."
+ ],
+ app:[
+  "PawMind helps your dog find inner peace with guided meditation tones and scent therapy. A calmer pup means a happier home!",
+  "ZenPup turns anxious barks into blissful naps through ambient music made for dogs. Yes, Fido finally finds his Zen.",
+  "CalmCanine is the first mental wellness app for pets — soothing soundscapes, breathing cues, and owner-dog sync sessions."
+ ],
+ hat:[
+  "EmotiCap reads your brainwaves and displays emojis that match your mood — perfect for introverts who still want to express themselves!",
+  "ThinkLight projects your thoughts as glowing color patterns, turning communication into an art form.",
+  "MoodBeam lets your team see your vibes before you even speak. Transparent emotions — literally."
+ ],
+ skateboard:[
+  "SkyBoard is where eco design meets adrenaline. This reusable rocket skateboard lets you commute like it’s 2090.",
+  "ThrustDeck is the skateboard for thrill-seekers. Its compact rockets give instant acceleration with total safety.",
+  "EcoGlide brings sustainability and excitement together — rocket speed, reusable fuel, and zero emissions."
+ ],
+ pen:[
+  "DreamScribe lets you wake up to find your dreams already written. It uses motion sensors and AI to turn sleep stories into real text.",
+  "NightWriter is your creative companion — it listens to your dreams and crafts short stories by morning.",
+  "SomniPen bridges your imagination and reality. Every flick of ink reveals what your subconscious saw last night."
+ ],
+ mirror:[
+  "StyleSync Mirror doesn’t just show your reflection — it’s your personal stylist, analyzing outfits and suggesting upgrades instantly.",
+  "GlamAI Mirror helps you look runway-ready every morning, with lighting and outfit suggestions powered by global fashion trends.",
+  "MoodMirror adjusts tones and music to match your energy, transforming your mirror time into a full experience."
+ ],
+ bottle:[
+  "HydraMood tracks your water intake and changes color to reflect your energy level — hydration meets self-awareness.",
+  "AquaPulse keeps you hydrated with smart reminders and motivational lights that glow when it’s time to drink.",
+  "SipSync monitors hydration and mood through your wristband, syncing data for balanced living."
+ ]
+};
+
+// ---------- SHOW VOTING ----------
+function showVoting(){
+ hide("pitch-display");$("rate-others").classList.remove("hidden");
+ const prompt=$("prompt-text").textContent;$("round-product").textContent="Product: "+prompt;
+ const yourPitch=$("pitch-text").value||"(No pitch)";
+ $("your-pitch-card").innerHTML=`<h3>Your Pitch</h3><p>${yourPitch}</p>`;
+ const topicKey=Object.keys(mockIdeas).find(k=>prompt.toLowerCase().includes(k))||"toothbrush";
+ const c=$("rate-container");c.innerHTML="";
+ mocks.forEach(m=>{
+  const idea=pick(mockIdeas[topicKey]);
+  const div=document.createElement("div");
+  div.className="pitch-card";
+  div.innerHTML=`<h4>${m.name}</h4><p>${idea}</p>
+   <label>Points (0–5): <input type="number" min="0" max="5" value="0" data-player="${m.name}"></label><br>
+   <label>Feedback: <input type="text" data-feedback="${m.name}" placeholder="Short feedback..."></label>`;
+  c.appendChild(div);
+ });
+ const inputs=c.querySelectorAll('input[type="number"]');
+ const btn=$("submit-ratings"),left=$("points-left");
+ function update(){
+  let total=0;inputs.forEach(i=>{i.value=Math.max(0,Math.min(5,Number(i.value)));total+=Number(i.value);});
+  left.textContent="Points left: "+(giveTotal-total);btn.disabled=(total!==giveTotal);
+ }
+ inputs.forEach(i=>i.addEventListener("input",update));update();
+}
+
+// ---------- RATING ----------
+function submitRatings(){
+ const ratings={};$("rate-container").querySelectorAll('input[type="number"]').forEach(i=>ratings[i.dataset.player]=Number(i.value));
+ const fbs=[];$("rate-container").querySelectorAll('input[type="text"]').forEach(t=>fbs.push({to:t.dataset.feedback,text:t.value||"Good pitch!"}));
+ player.feedbacks=fbs;
+
+ const received={You:0,Alex:0,Jamie:0,Riley:0};
+ for(const n in ratings)received[n]+=ratings[n];
+ const everyone=[player,...mocks];
+ mocks.forEach(g=>{
+  let pool=10;const given={You:0,Alex:0,Jamie:0,Riley:0};
+  while(pool>0){
+   const target=pick(everyone.filter(p=>p.name!==g.name));
+   if(given[target.name]>=5||received[target.name]>=15)continue;
+   const give=Math.min(5-given[target.name],15-received[target.name],pool,Math.ceil(Math.random()*3));
+   if(give<=0)break;
+   given[target.name]+=give;received[target.name]+=give;pool-=give;
+  }
+ });
+ player.score+=received["You"];mocks.forEach(m=>m.score+=received[m.name]);
+
+ // ---- AI feedback bank (longer & varied) ----
+const bank = [
+  "That was a really engaging pitch — you had great confidence and pacing! Maybe highlight the key value proposition earlier for maximum impact.",
+  "I liked how clearly you explained the product’s benefit. You could make it even stronger by ending with a memorable slogan or call to action.",
+  "Your pitch had excellent flow and structure. Consider adding a short example or user story to make it more relatable.",
+  "Really good enthusiasm and tone! Try varying your pacing slightly to emphasize your main point more.",
+  "Great job painting a vivid picture of the idea. It might help to simplify one or two technical details so the audience can follow easily.",
+  "You delivered your pitch with great energy — it really grabbed attention. Adding one emotional hook could make it even more persuasive.",
+  "Your concept stood out as very original. Clarify the problem it solves at the start for even more punch.",
+  "Impressive visuals and clear explanation. You could strengthen the ending by summarizing why this matters to the listener personally.",
+  "That was a creative and entertaining pitch! A bit more structure would make it feel more professional.",
+  "Your delivery was confident and natural — you clearly believed in your idea. Maybe tighten it up by trimming small filler phrases.",
+  "Loved your humor and personality in this one! Balancing it with a touch of data or a fact might make it even more convincing.",
+  "Excellent storytelling — I could visualize the product instantly. Try slowing down a little at key moments for emphasis.",
+  "You kept the pitch concise and to the point. Adding a clear next step or audience benefit could make it unforgettable.",
+  "Good use of emotion and excitement — it really felt like a startup pitch. Maybe add one surprising fact to make it stand out even more.",
+  "Very professional tone and structure. You might want to show a bit more passion or personality to connect with your audience."
+];
+
+ player.receivedFeedback=mocks.map(m=>({from:m.name,text:pick(bank)}));
+
+ // ---- AI UPVOTES  (player included) ----
+ const allFeedbacks=[...player.feedbacks,...player.receivedFeedback.map(f=>({to:"You",text:f.text,from:f.from}))];
+ mocks.forEach(()=>{const fb=pick(allFeedbacks);const r=[player,...mocks].find(p=>p.name===fb.to);if(r)r.upvotes++;});
+
+ showFeedbackPhase();
+}
+
+// ---------- FEEDBACK ----------
+function showFeedbackPhase(){
+ hide("rate-others");$("feedback-phase").classList.remove("hidden");
+ const list=$("feedback-list");list.innerHTML="";let chosen=false;
+ player.receivedFeedback.forEach(f=>{
+  const div=document.createElement("div");div.className="feedback-card";
+  div.innerHTML=`<p><b>${f.from}:</b> ${f.text}</p><button data-upvote="${f.from}">👍 Upvote</button>`;
+  list.appendChild(div);
+ });
+ list.querySelectorAll("button").forEach(b=>b.onclick=e=>{
+  if(chosen)return;chosen=true;
+  const giver=mocks.find(p=>p.name===e.target.dataset.upvote);if(giver)giver.upvotes++;
+  e.target.textContent="Upvoted!";$("submit-feedback").disabled=false;
+ });
+}
+
+// ---------- LEADERBOARD ----------
+function submitFeedback(){hide("feedback-phase");showBoard();}
+function showBoard(){
+ $("leaderboard-screen").classList.remove("hidden");
+ const all=[player,...mocks].sort((a,b)=>b.score-a.score);
+ let html="<table><tr><th>Player</th><th>Score</th><th>Upvotes</th></tr>";
+ all.forEach(p=>html+=`<tr><td>${p.name}</td><td>${p.score}</td><td>${p.upvotes}</td></tr>`);html+="</table>";
+ $("round-leaderboard").innerHTML=html;
+}
+function nextRound(){round++;if(round>rounds)endGame();else newRound();}
+function endGame(){
+ hide("leaderboard-screen");$("end-screen").classList.remove("hidden");
+ const all=[player,...mocks];const maxUp=Math.max(...all.map(p=>p.upvotes));
+ all.forEach(p=>{if(p.upvotes===maxUp)p.score+=10;});
+ const sorted=all.sort((a,b)=>b.score-a.score);
+ let html="<table><tr><th>Player</th><th>Final Score</th><th>Upvotes</th></tr>";
+ sorted.forEach(p=>html+=`<tr><td>${p.name}</td><td>${p.score}</td><td>${p.upvotes}</td></tr>`);html+="</table>";
+ $("final-leaderboard").innerHTML=html;
+}
+</script>
+</body>
+</html>
