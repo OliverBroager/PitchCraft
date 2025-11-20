@@ -1,7 +1,7 @@
 # 🎤 PitchCraft — The Fast-Paced Pitching Game
 
 **PitchCraft** is a lighthearted browser game where you practice crafting creative startup pitches under time pressure.  
-You’ll be given a random, often ridiculous product idea — like _“a smart toothbrush that gives dating advice”_ — and have **60 seconds** to write your pitch.
+You’ll be given a random, often ridiculous product idea — like _“a smart toothbrush that gives dating advice”_ — and have **120 seconds** to write your pitch.
 
 Then you’ll see mock competitors present their own versions, rate them, give short feedback, and watch the leaderboard update after each round.
 
@@ -18,7 +18,7 @@ Then you’ll see mock competitors present their own versions, rate them, give s
 ## 🕹️ How to Play
 
 1. Hit **Start Game** to get your random product prompt.  
-2. Write your pitch in **60 seconds**.  
+2. Write your pitch in **120 seconds**.  
 3. Read the **mock players’ lively pitches**.  
 4. Distribute **10 points** between them (max 5 per player) and leave short feedback.  
 5. Review the feedback you received, **upvote one helpful comment**, and move to the next round!  
