@@ -31,7 +31,7 @@
 <section id="prompt-screen" class="hidden">
  <h2>Your Product Prompt</h2>
  <p id="prompt-text"></p>
- <p>Time left: <span id="timer">60</span>s</p>
+<p>Time left: <span id="timer">120</span>s</p>
  <textarea id="pitch-text" placeholder="Write your pitch..."></textarea>
  <input id="img-url" type="text" placeholder="(Optional) Add image URL">
  <button id="submit-pitch">Submit Pitch</button>
@@ -96,7 +96,7 @@ const mocks=[
 ];
 const player={name:"You",score:0,upvotes:0};
 const giveTotal=10,maxPer=5,receiveCap=15,rounds=3;
-let round=0,timer=60,tInt;
+let round=0,timer=120,tInt;
 
 const $=id=>document.getElementById(id);
 function hide(...ids){ids.forEach(i=>$(i).classList.add("hidden"));}
@@ -118,7 +118,7 @@ function newRound(){
  const prompt=pick(prompts);
  $("prompt-text").textContent=prompt;
  $("pitch-text").value="";$("img-url").value="";
- timer=60;$("timer").textContent=timer;
+ timer=120;$("timer").textContent=timer;
  if(tInt)clearInterval(tInt);
  tInt=setInterval(()=>{timer--;$("timer").textContent=timer;if(timer<=0){clearInterval(tInt);submitPitch();}},1000);
 }
